@@ -1117,6 +1117,8 @@ MonoBehaviour:
     [Space]
     - Jump
 
+    [Dash] - E
+
     [Number 1] - Camera 1
 
     [Number 2] - Camera 2'

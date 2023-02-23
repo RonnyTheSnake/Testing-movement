@@ -353,9 +353,10 @@
 -r:"Library/Bee/artifacts/1900b0aE.dag/Unity.VSCode.Editor.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEditor.UI.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEngine.UI.ref.dll"
-"Assets/Dash.cs"
-"Assets/PlayerMovement.cs"
-"Assets/RandomScript.cs"
+"Assets/Scripts/Dash.cs"
+"Assets/Scripts/PlayerMovement.cs"
+"Assets/Scripts/RandomScript.cs"
+"Assets/Scripts/ThirdPersonCamera.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01_UGUI.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark02.cs"
@@ -390,7 +391,6 @@
 "Assets/TextMesh Pro/Examples & Extras/Scripts/VertexShakeB.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/VertexZoom.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/WarpTextExample.cs"
-"Assets/ThirdPersonCamera.cs"
 -langversion:9.0
 
 /deterministic
