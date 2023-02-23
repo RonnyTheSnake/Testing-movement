@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class ThirdPersonCamera : MonoBehaviour
 {
@@ -84,5 +85,10 @@ public class ThirdPersonCamera : MonoBehaviour
         }
 
         currentCameraType = newCameraType;
+    }
+
+    public void DashFOV(float endValue)
+    {
+        GetComponent<Camera>().DOFieldOfView(endValue, 0.25f);
     }
 }

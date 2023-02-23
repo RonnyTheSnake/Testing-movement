@@ -5,10 +5,15 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Movement")]
+    [SerializeField] 
     private float movementSpeed;
+    public float MovementSpeed { get { return movementSpeed; } }
+    [Header("Movement")]    
+
     public float walkSpeed;
     public float sprintSpeed;
+    public float dashSpeed;
+    public float dashSpeedChangeFactor;
 
     public float groundDrag;
 
@@ -45,11 +50,13 @@ public class PlayerMovement : MonoBehaviour
     {
         Walk,
         Sprint,
+        Dash,
         Airial
     }
+    public bool dashing;
 
     [Header("Movement State")]
-    public MovementState currentMovement;    
+    public MovementState currentMovementState;    
 
     // Start is called before the first frame update
     void Start()
@@ -58,12 +65,18 @@ public class PlayerMovement : MonoBehaviour
         rBody.freezeRotation = true;
     }
 
+    private float desiredMovementSpeed;
+    private float previouslyDesiredMovementSpeed;
+    private MovementState previousMovementState;
+    private bool keepMomentum;
+
+
     // Update is called once per frame
     void Update()
     {
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, IsGround);
 
-        if (grounded)
+        if (currentMovementState == MovementState.Walk || currentMovementState == MovementState.Sprint)
         {
             rBody.drag = groundDrag;
         }
@@ -98,20 +111,80 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovementHandler()
     {
-        if(grounded && Input.GetKey(sprintKey))
+
+        if (dashing)
         {
-            currentMovement = MovementState.Sprint;
-            movementSpeed = sprintSpeed;
+            currentMovementState = MovementState.Dash;
+            desiredMovementSpeed = dashSpeed;
+            speedChangeFactor = dashSpeedChangeFactor;
+        }
+        else if(grounded && Input.GetKey(sprintKey))
+        {
+            currentMovementState = MovementState.Sprint;
+            desiredMovementSpeed = sprintSpeed;
         }
         else if (grounded)
         {
-            currentMovement = MovementState.Walk;
-            movementSpeed = walkSpeed;
+            currentMovementState = MovementState.Walk;
+            desiredMovementSpeed = walkSpeed;
         }
         else
         {
-            currentMovement = MovementState.Airial;
+            currentMovementState = MovementState.Airial;
+            if(desiredMovementSpeed < sprintSpeed)
+            {
+                desiredMovementSpeed = walkSpeed;
+            }
+            else
+            {
+                desiredMovementSpeed = sprintSpeed;
+            }
         }
+
+        bool desiredMovementSpeedHasChanged = desiredMovementSpeed != previouslyDesiredMovementSpeed;
+        if(previousMovementState == MovementState.Dash)
+        {
+            keepMomentum = true;
+        }
+
+        if (desiredMovementSpeedHasChanged)
+        {
+            if (keepMomentum)
+            {
+                StopAllCoroutines();
+                StartCoroutine(SmoothlyLerpMovementSpeed());
+            }
+            else
+            {
+                StopAllCoroutines();
+                movementSpeed = desiredMovementSpeed;
+            }
+        }
+
+        previouslyDesiredMovementSpeed = desiredMovementSpeed;
+        previousMovementState = currentMovementState;
+    }
+
+    private float speedChangeFactor;
+
+    private IEnumerator SmoothlyLerpMovementSpeed() //Take a deeper look into this method
+    {
+        float time = 0;
+        float difference = Mathf.Abs(desiredMovementSpeed - movementSpeed);
+        float startValue = movementSpeed;
+
+        float boostFactor = speedChangeFactor;
+
+        while(time < difference)
+        {
+            movementSpeed = Mathf.Lerp(startValue, desiredMovementSpeed, time/difference);
+            time += Time.deltaTime * boostFactor;
+            yield return null;
+        }
+
+        movementSpeed = desiredMovementSpeed;
+        speedChangeFactor = 1f;
+        keepMomentum = false;
     }
 
     private void MovePlayer()
